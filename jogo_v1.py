@@ -17,22 +17,72 @@ METEOR_HEIGHT = 38
 font = pygame.font.SysFont(None, 48)
 background = pygame.image.load('assets/img/starfield.png').convert()
 meteor_img = pygame.image.load('assets/img/meteorBrown_med1.png').convert_alpha()
-meteor_img_small = pygame.transform.scale(meteor_img, (METEOR_WIDTH, METEOR_HEIGHT))
+meteor_roxo_img = pygame.image.load('assets/img/asteroid_roxo.png').convert_alpha()
+meteor_img = pygame.transform.scale(meteor_img, (METEOR_WIDTH, METEOR_HEIGHT))
+meteor_roxo_img = pygame.transform.scale(meteor_roxo_img, (METEOR_WIDTH, METEOR_HEIGHT))
 
 # ----- Inicia estruturas de dados
+# Definindo os novos tipos
+class Meteor(pygame.sprite.Sprite):
+    def __init__(self, img):
+        # Construtor da classe mãe (Sprite).
+        pygame.sprite.Sprite.__init__(self)
+
+        self.image = img
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randint(0, WIDTH-METEOR_WIDTH)
+        self.rect.y = random.randint(-100, -METEOR_HEIGHT)
+        self.speedx = random.randint(-3, 3)
+        self.speedy = random.randint(2, 9)
+
+    def update(self):
+        # Atualizando a posição do meteoro
+        self.rect.x += self.speedx
+        self.rect.y += self.speedy
+        # Se o meteoro passar do final da tela, volta para cima e sorteia
+        # novas posições e velocidades
+        if self.rect.top > HEIGHT or self.rect.right < 0 or self.rect.left > WIDTH:
+            self.rect.x = random.randint(0, WIDTH-METEOR_WIDTH)
+            self.rect.y = random.randint(-100, -METEOR_HEIGHT)
+            self.speedx = random.randint(-3, 3)
+            self.speedy = random.randint(2, 9)
+
+class Meteor_roxo(pygame.sprite.Sprite):
+    def __init__(self, img):
+        # Construtor da classe mãe (Sprite).
+        pygame.sprite.Sprite.__init__(self)
+
+        self.image = img
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randint(0, WIDTH-METEOR_WIDTH)
+        self.rect.y = random.randint(-100, -METEOR_HEIGHT)
+        self.speedx = random.randint(-3, 3)
+        self.speedy = random.randint(2, 9)
+
+    def update(self):
+        # Atualizando a posição do meteoro
+        self.rect.x += self.speedx
+        self.rect.y += self.speedy
+        # Se o meteoro passar do final da tela, volta para cima e sorteia
+        # novas posições e velocidades
+        if self.rect.top > HEIGHT or self.rect.right < 0 or self.rect.left > WIDTH:
+            self.rect.x = random.randint(0, WIDTH-METEOR_WIDTH)
+            self.rect.y = random.randint(-100, -METEOR_HEIGHT)
+            self.speedx = random.randint(-3, 3)
+            self.speedy = random.randint(2, 9)
+
 game = True
-# Sorteia posição aleatória
-# Como x é o lado esquerdo da imagem, ele só pode ir até a largura da
-# janela menos a largura da imagem
-meteor_x = random.randint(0, WIDTH-METEOR_WIDTH)
-# y negativo significa que está acima do topo da janela. O meteoro começa fora da janela
-meteor_y = random.randint(-100, -METEOR_HEIGHT)
-# Sorteia velocidade do meteoro
-meteor_speedx = random.randint(-3, 3)
-meteor_speedy = random.randint(2, 9)
 # Variável para o ajuste de velocidade
 clock = pygame.time.Clock()
 FPS = 60
+
+# Criando dois meteoros normais
+meteor1 = Meteor(meteor_img)
+meteor2 = Meteor(meteor_img)
+
+# criando dois meteoros roxos
+meteor_roxo_1 = Meteor_roxo(meteor_roxo_img)
+meteor_roxo_2 = Meteor_roxo(meteor_roxo_img)
 
 # ===== Loop principal =====
 while game:
@@ -45,23 +95,27 @@ while game:
             game = False
 
     # ----- Atualiza estado do jogo
-    # Atualizando a posição do meteoro
-    meteor_x += meteor_speedx
-    meteor_y += meteor_speedy
-    # Se o meteoro passar do final da tela, volta para cima e sorteia
-    # novas posições e velocidades
-    if meteor_y > HEIGHT or meteor_x + METEOR_WIDTH < 0 or meteor_x > WIDTH:
-        meteor_x = random.randint(0, WIDTH-METEOR_WIDTH)
-        meteor_y = random.randint(-100, -METEOR_HEIGHT)
-        meteor_speedx = random.randint(-3, 3)
-        meteor_speedy = random.randint(2, 9)
+    # Atualizando a posição dos meteoros normais
+    meteor1.update()
+    meteor2.update()
+
+    # atualiza a posição dos meteoros roxos
+    meteor_roxo_1.update()
+    meteor_roxo_2.update()
 
     # ----- Gera saídas
     window.fill((0, 0, 0))  # Preenche com a cor branca
     window.blit(background, (0, 0))
-    window.blit(meteor_img_small, (meteor_x, meteor_y))
+    # Desenhando meteoros
+    window.blit(meteor1.image, meteor1.rect)
+    window.blit(meteor2.image, meteor2.rect)
+    # desenhando os meteoros roxos
+    window.blit(meteor_roxo_1.image, meteor_roxo_1.rect)
+    window.blit( meteor_roxo_2.image, meteor_roxo_2.rect)
+
     pygame.display.update()  # Mostra o novo frame para o jogador
 
 # ===== Finalização =====
 pygame.quit()  # Função do PyGame que finaliza os recursos utilizados
+
 
