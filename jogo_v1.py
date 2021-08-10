@@ -74,15 +74,21 @@ class Meteor_roxo(pygame.sprite.Sprite):
 game = True
 # Variável para o ajuste de velocidade
 clock = pygame.time.Clock()
-FPS = 60
+FPS = 30
 
-# Criando dois meteoros normais
-meteor1 = Meteor(meteor_img)
-meteor2 = Meteor(meteor_img)
+# criando grupo de meteoros normais
+all_meteors = pygame.sprite.Group()
+# criando os meteoros
+for i in range(4):
+    meteor = Meteor(meteor_img)
+    all_meteors.add(meteor)
 
-# criando dois meteoros roxos
-meteor_roxo_1 = Meteor_roxo(meteor_roxo_img)
-meteor_roxo_2 = Meteor_roxo(meteor_roxo_img)
+# criando grupo de meteoros roxos
+all_meteors_roxo = pygame.sprite.Group()
+# criando os meteoros
+for i in range(4):
+    meteor_roxo = Meteor(meteor_roxo_img)
+    all_meteors.add(meteor_roxo)
 
 # ===== Loop principal =====
 while game:
@@ -96,22 +102,17 @@ while game:
 
     # ----- Atualiza estado do jogo
     # Atualizando a posição dos meteoros normais
-    meteor1.update()
-    meteor2.update()
 
-    # atualiza a posição dos meteoros roxos
-    meteor_roxo_1.update()
-    meteor_roxo_2.update()
+    all_meteors.update()
+    all_meteors_roxo.update()
 
     # ----- Gera saídas
     window.fill((0, 0, 0))  # Preenche com a cor branca
     window.blit(background, (0, 0))
-    # Desenhando meteoros
-    window.blit(meteor1.image, meteor1.rect)
-    window.blit(meteor2.image, meteor2.rect)
-    # desenhando os meteoros roxos
-    window.blit(meteor_roxo_1.image, meteor_roxo_1.rect)
-    window.blit( meteor_roxo_2.image, meteor_roxo_2.rect)
+    # Desenhando meteoros normais
+    all_meteors.draw(window)
+    # Desenhando os meteoros roxos
+    all_meteors_roxo.draw(window)
 
     pygame.display.update()  # Mostra o novo frame para o jogador
 
