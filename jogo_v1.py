@@ -18,40 +18,38 @@ METEOR_WIDTH = 50
 METEOR_HEIGHT = 38
 SHIP_WIDTH = 50
 SHIP_HEIGHT = 38
-font = pygame.font.SysFont(None, 48)
-background = pygame.image.load('assets/img/starfield.png').convert()
-meteor_img = pygame.image.load('assets/img/meteorBrown_med1.png').convert_alpha()
-meteor_roxo_img = pygame.image.load('assets/img/asteroid_roxo.png').convert_alpha()
-meteor_img = pygame.transform.scale(meteor_img, (METEOR_WIDTH, METEOR_HEIGHT))
-meteor_roxo_img = pygame.transform.scale(meteor_roxo_img, (METEOR_WIDTH, METEOR_HEIGHT))
-ship_img = pygame.image.load("assets/img/playerShip1_orange.png").convert_alpha()
-ship_img = pygame.transform.scale(ship_img,(SHIP_WIDTH,SHIP_HEIGHT))
-bullet_img = pygame.image.load("assets/img/laserRed16.png").convert_alpha()
+assets = {}
+assets["background"] = pygame.image.load("assets/img/starfield.png").convert()
+assets["meteor_img"] = pygame.image.load("assets/img/meteorBrown_med1.png").convert_alpha()
+assets["meteor_img"] = pygame.transform.scale(assets["meteor_img"], (METEOR_WIDTH, METEOR_HEIGHT))
+assets["meteor_roxo_img"] = pygame.image.load("assets/img/asteroid_roxo.png").convert_alpha()
+assets["meteor_roxo_img"] = pygame.transform.scale(assets["meteor_roxo_img"], (METEOR_WIDTH, METEOR_HEIGHT))
+assets["ship_img"] = pygame.image.load("assets/img/playerShip1_orange.png").convert_alpha()
+assets["ship_img"] = pygame.transform.scale(assets["ship_img"], (SHIP_WIDTH, SHIP_HEIGHT))
+assets["bullet_img"] = pygame.image.load("assets/img/laserRed16.png").convert_alpha()
 
 # carrega os sons do jogo
 pygame.mixer.music.load("assets/snd/tgfcoder-FrozenJam-SeamlessLoop.ogg")
 pygame.mixer.music.set_volume(0.4)
 boom_sound = pygame.mixer.Sound("assets/snd/expl3.wav")
 destroy_sound = pygame.mixer.Sound("assets/snd/expl6.wav")
-pew_sound = pygame.mixer.Sound("assets/snd/pew.wav")
+assets["pew_sound"] = pygame.mixer.Sound("assets/snd/pew.wav")
 
 # ----- Inicia estruturas de dados
 # Definindo os novos tipos
 class Ship(pygame.sprite.Sprite):
-    def __init__(self,img,all_sprites,all_bullets,bullet_img,pew_sound):
+    def __init__(self,groups,assets):
         # construtor da classe mãe (Sprite)
         pygame.sprite.Sprite.__init__(self)
 
-        self.image = img
+        self.image = assets["ship_img"]
         self.rect = self.image.get_rect()
         self.rect.centerx = WIDTH/2
         self.rect.bottom = HEIGHT - 10
         self.speedx = 0
         self.speedy = 0
-        self.all_sprites = all_sprites
-        self.all_bullets = all_bullets
-        self.bullet_img = bullet_img
-        self.pew_sound = pew_sound
+        self.groups = groups
+        self.assets = assets
 
     def update(self):
         # Atualização da posição da nave
@@ -71,17 +69,17 @@ class Ship(pygame.sprite.Sprite):
     
     def shoot(self):
         # a nova bala vai ser criada logo acima e no centro horizontal da nave
-        new_bullet = Bullet(self.bullet_img,self.rect.top,self.rect.centerx)
-        self.all_sprites.add(new_bullet)
-        self.all_bullets.add(new_bullet)
-        self.pew_sound.play()
+        new_bullet = Bullet(self.assets, self.rect.top, self.rect.centerx)
+        self.groups["all_sprites"].add(new_bullet)
+        self.groups["all_bullets"].add(new_bullet)
+        self.assets["pew_sound"].play()
 
 class Meteor(pygame.sprite.Sprite):
-    def __init__(self, img):
+    def __init__(self, assets):
         # Construtor da classe mãe (Sprite).
         pygame.sprite.Sprite.__init__(self)
 
-        self.image = img
+        self.image = assets["meteor_img"]
         self.rect = self.image.get_rect()
         self.rect.x = random.randint(0, WIDTH-METEOR_WIDTH)
         self.rect.y = random.randint(-100, -METEOR_HEIGHT)
@@ -101,11 +99,11 @@ class Meteor(pygame.sprite.Sprite):
             self.speedy = random.randint(2, 9)
 
 class Meteor_roxo(pygame.sprite.Sprite):
-    def __init__(self, img):
+    def __init__(self, assets):
         # Construtor da classe mãe (Sprite).
         pygame.sprite.Sprite.__init__(self)
 
-        self.image = img
+        self.image = assets["meteor_roxo_img"]
         self.rect = self.image.get_rect()
         self.rect.x = random.randint(0, WIDTH-METEOR_WIDTH)
         self.rect.y = random.randint(-100, -METEOR_HEIGHT)
@@ -127,11 +125,11 @@ class Meteor_roxo(pygame.sprite.Sprite):
 # classe bullet que representa os tiros
 class Bullet(pygame.sprite.Sprite):
     # construtor da classe
-    def __init__(self,img,bottom,centerx):
+    def __init__(self,assets,bottom,centerx):
         # contrutor da classe mãe (sprite)
         pygame.sprite.Sprite.__init__(self)
 
-        self.image = img
+        self.image = assets["bullet_img"]
         self.rect = self.image.get_rect()
 
         # coloca no lugar inicial definido em x,y do contrutor
@@ -159,14 +157,19 @@ all_meteors = pygame.sprite.Group()
 all_meteors_roxo = pygame.sprite.Group()
 # criando as balas
 all_bullets = pygame.sprite.Group()
+groups = {}
+groups["all_sprites"] = all_sprites
+groups["all_meteors"] = all_meteors
+groups["all_meteors_roxo"] = all_meteors_roxo
+groups["all_bullets"] = all_bullets
 
 # criando o jogador
-player = Ship(ship_img,all_sprites,all_bullets,bullet_img,pew_sound)
+player = Ship(groups,assets)
 all_sprites.add(player)
 
 # criando os meteoros normais
 for i in range(6):
-    meteor = Meteor(meteor_img)
+    meteor = Meteor(assets)
     all_sprites.add(meteor)
     all_meteors.add(meteor)
 
@@ -174,7 +177,7 @@ for i in range(6):
 all_meteors_roxo = pygame.sprite.Group()
 # criando os meteoros
 for i in range(3):
-    meteor_roxo = Meteor(meteor_roxo_img)
+    meteor_roxo = Meteor_roxo(assets)
     all_sprites.add(meteor_roxo)
     all_meteors_roxo.add(meteor_roxo)
 
@@ -222,7 +225,7 @@ while game:
     hits = pygame.sprite.groupcollide(all_meteors,all_bullets,True, True)
     for meteor in hits:
         # o meteoro é destuido e precisa ser recriado
-        m = Meteor(meteor_img)
+        m = Meteor(assets)
         all_sprites.add(m)
         all_meteors.add(m)
     
@@ -230,7 +233,7 @@ while game:
     hits_roxo = pygame.sprite.groupcollide(all_meteors_roxo,all_bullets,True, True)
     for meteor in hits_roxo:
         # o meteoro é destuido e precisa ser recriado
-        m = Meteor_roxo(meteor_img)
+        m = Meteor_roxo(assets)
         all_sprites.add(m)
         all_meteors_roxo.add(m)  
 
@@ -250,7 +253,7 @@ while game:
 
     # ----- Gera saídas
     window.fill((0, 0, 0))  # Preenche com a cor branca
-    window.blit(background, (0, 0))
+    window.blit(assets["background"], (0, 0))
     # Desenhando meteoros 
     all_sprites.draw(window)
 
