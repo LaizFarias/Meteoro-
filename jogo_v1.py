@@ -3,8 +3,6 @@
 import pygame
 import random
 
-from pygame import image
-
 pygame.init()
 
 # ----- Gera tela principal
@@ -39,16 +37,23 @@ class Ship(pygame.sprite.Sprite):
         self.rect.centerx = WIDTH/2
         self.rect.bottom = HEIGHT - 10
         self.speedx = 0
+        self.speedy = 0
     
     def update(self):
         # Atualização da posição da nave
-        self.rect.x +=self.speedx
+        self.rect.x += self.speedx
+        self.rect.y += self.speedy
 
         # mantem dentro da tela
         if self.rect.right > WIDTH:
             self.rect.right = WIDTH
         if self.rect.left < 0:
             self.rect.left = 0
+        ## mantendo dentro da tela no fundo e em cima
+        if self.rect.top < 0:
+            self.rect.top = 0
+        if self.rect.bottom > HEIGHT:
+            self.rect.bottom = HEIGHT
 
 class Meteor(pygame.sprite.Sprite):
     def __init__(self, img):
@@ -132,6 +137,28 @@ while game:
         # ----- Verifica consequências
         if event.type == pygame.QUIT:
             game = False
+        # verifica se apertou alguma tecla
+        if event.type == pygame.KEYDOWN:
+            # dependendo da tecla, altera a valocidade
+            if event.key == pygame.K_LEFT:
+                player.speedx -= 8
+            if event.key == pygame.K_RIGHT:
+                player.speedx += 8
+            if event.key == pygame.K_UP:
+                player.speedy -= 8
+            if event.key == pygame.K_DOWN:
+                player.speedy += 8
+        # verifica se soltou alguma tecla
+        if event.type == pygame.KEYUP:
+            # dependendo da tecla, altera a valocidade
+            if event.key == pygame.K_LEFT:
+                player.speedx += 8
+            if event.key == pygame.K_RIGHT:
+                player.speedx -= 8
+            if event.key == pygame.K_UP:
+                player.speedy += 8
+            if event.key == pygame.K_DOWN:
+                player.speedy -= 8
 
     # ----- Atualiza estado do jogo
     # Atualizando a posição dos meteoros
