@@ -24,11 +24,11 @@ meteor_img = pygame.transform.scale(meteor_img, (METEOR_WIDTH, METEOR_HEIGHT))
 meteor_roxo_img = pygame.transform.scale(meteor_roxo_img, (METEOR_WIDTH, METEOR_HEIGHT))
 ship_img = pygame.image.load("assets/img/playerShip1_orange.png").convert_alpha()
 ship_img = pygame.transform.scale(ship_img,(SHIP_WIDTH,SHIP_HEIGHT))
-
+bullet_img = pygame.image.load("assets/img/laserRed16.png").convert_alpha()
 # ----- Inicia estruturas de dados
 # Definindo os novos tipos
 class Ship(pygame.sprite.Sprite):
-    def __init__(self,img):
+    def __init__(self,img,all_sprites,all_bullets,bullet_img):
         # construtor da classe mãe (Sprite)
         pygame.sprite.Sprite.__init__(self)
 
@@ -38,6 +38,9 @@ class Ship(pygame.sprite.Sprite):
         self.rect.bottom = HEIGHT - 10
         self.speedx = 0
         self.speedy = 0
+        self.all_sprites = all_sprites
+        self.all_bullets = all_bullets
+        self.bullet_img = bullet_img
     
     def update(self):
         # Atualização da posição da nave
@@ -54,6 +57,12 @@ class Ship(pygame.sprite.Sprite):
             self.rect.top = 0
         if self.rect.bottom > HEIGHT:
             self.rect.bottom = HEIGHT
+    
+    def shoot(self):
+        # a nova bala vai ser criada logo acima e no centro horizontal da nave
+        new_bullet = Bullet(self.bullet_img,self.rect.top,self.rect.centerx)
+        self.all_sprites.add(new_bullet)
+        self.all_bullets.add(new_bullet)
 
 class Meteor(pygame.sprite.Sprite):
     def __init__(self, img):
@@ -103,6 +112,29 @@ class Meteor_roxo(pygame.sprite.Sprite):
             self.speedx = random.randint(-3, 3)
             self.speedy = random.randint(2, 9)
 
+# classe bullet que representa os tiros
+class Bullet(pygame.sprite.Sprite):
+    # construtor da classe
+    def __init__(self,img,bottom,centerx):
+        # contrutor da classe mãe (sprite)
+        pygame.sprite.Sprite.__init__(self)
+
+        self.image = img
+        self.rect = self.image.get_rect()
+
+        # coloca no lugar inicial definido em x,y do contrutor
+        self.rect.centerx = centerx
+        self.rect.bottom = bottom
+        self.speedy = -10 # velocidade fixa para cima
+
+    def update(self):
+        # a bala só se move no eixo y
+        self.rect.y += self.speedy
+
+        # se o tiro passar do inicio da tela, morre
+        if self.rect.bottom < 0:
+            self.kill()
+
 game = True
 # Variável para o ajuste de velocidade
 clock = pygame.time.Clock()
@@ -113,9 +145,11 @@ all_sprites = pygame.sprite.Group()
 all_meteors = pygame.sprite.Group()
 # criando grupo de meteoros roxos
 all_meteors_roxo = pygame.sprite.Group()
+# criando as balas
+all_bullets = pygame.sprite.Group()
 
 # criando o jogador
-player = Ship(ship_img)
+player = Ship(ship_img,all_sprites,all_bullets,bullet_img)
 all_sprites.add(player)
 
 # criando os meteoros normais
@@ -152,6 +186,8 @@ while game:
                 player.speedy -= 8
             if event.key == pygame.K_DOWN:
                 player.speedy += 8
+            if event.key == pygame.K_SPACE:
+                player.shoot()
         # verifica se soltou alguma tecla
         if event.type == pygame.KEYUP:
             # dependendo da tecla, altera a valocidade
@@ -170,9 +206,13 @@ while game:
 
     # verifica se houve colisão entre a nave e o meteoro comum
     hits = pygame.sprite.spritecollide(player,all_meteors, True)
+    if len(hits) > 0:
+        game = False
 
     # verifica se houve colisão entre a nave e o meteoro roxo
     hits_roxo = pygame.sprite.spritecollide(player,all_meteors_roxo, True)
+    if len(hits_roxo) > 0:
+        game = False
 
     # ----- Gera saídas
     window.fill((0, 0, 0))  # Preenche com a cor branca
@@ -184,5 +224,3 @@ while game:
 
 # ===== Finalização =====
 pygame.quit()  # Função do PyGame que finaliza os recursos utilizados
-
-
