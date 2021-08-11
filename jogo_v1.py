@@ -253,8 +253,9 @@ PLAYING = 1
 EXPLODING = 2
 state = PLAYING
 
-score = 0
 keys_down = {}
+score = 0
+lives = 3
 
 # ===== Loop principal =====
 pygame.mixer.music.play(loops = -1)
@@ -337,6 +338,7 @@ while state != DONE:
         if len(hits) > 0:
             assets["boom_sound"].play()
             player.kill()
+            lives -= 1
             explosao = Explosion(player.rect.center,assets)
             all_sprites.add(explosao)
             state = EXPLODING
@@ -344,11 +346,12 @@ while state != DONE:
             explosion_ticks = pygame.time.get_ticks()
             explosion_duration = explosao.frame_ticks*len(explosion_anim) + 400
 
-        # verifica se houve colisão entre a nave e o meteoro roxo
+        # verifica se houve colisão entre a nave e o meteoro roxo, que tira 2 vidas
         hits_roxo = pygame.sprite.spritecollide(player,all_meteors_roxo, True)
         if len(hits_roxo) > 0:
             assets["boom_sound"].play()
             player.kill()
+            lives -= 2
             explosao = Explosion(player.rect.center,assets)
             all_sprites.add(explosao)
             state = EXPLODING
@@ -359,9 +362,12 @@ while state != DONE:
     elif state == EXPLODING:
         now = pygame.time.get_ticks()
         if now - explosion_ticks > explosion_duration:
-            state = DONE
-            player = Ship(groups, assets)
-            all_sprites.add(player)
+            if lives <= 0:
+                state = DONE
+            else:
+                state = PLAYING
+                player = Ship(groups, assets)
+                all_sprites.add(player)
 
     # ----- Gera saídas
     window.fill((0, 0, 0))  # Preenche com a cor branca
@@ -373,6 +379,12 @@ while state != DONE:
     text_surface = assets["score_font"].render("{:08d}".format(score), True, (255, 255, 0))
     text_rect = text_surface.get_rect()
     text_rect.midtop = (WIDTH / 2,  10)
+    window.blit(text_surface, text_rect)
+
+    # Desenhando as vidas
+    text_surface = assets['score_font'].render(chr(9829) * lives, True, (255, 0, 0))
+    text_rect = text_surface.get_rect()
+    text_rect.bottomleft = (10, HEIGHT - 10)
     window.blit(text_surface, text_rect)
 
     pygame.display.update()  # Mostra o novo frame para o jogador
