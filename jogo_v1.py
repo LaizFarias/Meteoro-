@@ -27,12 +27,20 @@ assets["meteor_roxo_img"] = pygame.transform.scale(assets["meteor_roxo_img"], (M
 assets["ship_img"] = pygame.image.load("assets/img/playerShip1_orange.png").convert_alpha()
 assets["ship_img"] = pygame.transform.scale(assets["ship_img"], (SHIP_WIDTH, SHIP_HEIGHT))
 assets["bullet_img"] = pygame.image.load("assets/img/laserRed16.png").convert_alpha()
+explosion_anim = []
+for i in range(9):
+    # Os arquivos de animação são numerados de 00 a 08
+    filename = "assets/img/regularExplosion0{}.png".format(i)
+    img = pygame.image.load(filename).convert()
+    img = pygame.transform.scale(img, (32, 32))
+    explosion_anim.append(img)
+assets["explosion_anim"] = explosion_anim
 
 # carrega os sons do jogo
 pygame.mixer.music.load("assets/snd/tgfcoder-FrozenJam-SeamlessLoop.ogg")
 pygame.mixer.music.set_volume(0.4)
-boom_sound = pygame.mixer.Sound("assets/snd/expl3.wav")
-destroy_sound = pygame.mixer.Sound("assets/snd/expl6.wav")
+assets["boom_sound"] = pygame.mixer.Sound("assets/snd/expl3.wav")
+assets["destroy_sound"] = pygame.mixer.Sound("assets/snd/expl6.wav")
 assets["pew_sound"] = pygame.mixer.Sound("assets/snd/pew.wav")
 
 # ----- Inicia estruturas de dados
@@ -145,6 +153,54 @@ class Bullet(pygame.sprite.Sprite):
         if self.rect.bottom < 0:
             self.kill()
 
+# classe que representa uma explosão do meteoro
+class Explosion(pygame.sprite.Sprite):
+    # construtor da classe
+    def __init__(self,center,assets):
+        # contrutor da classe mãe
+        pygame.sprite.Sprite.__init__(self)
+
+        # armazena a animação de explosão
+        self.explosion_anim = assets["explosion_anim"]
+
+        # inicia o processo de animação colocando a primeira imagem na tela
+        self.frame = 0
+        self.image = self.explosion_anim[self.frame] # pega a primeira imagem
+        self.rect = self.image.get_rect()
+        self.rect.center = center # posiciona o centro da imagem
+
+        # guarda o tick da primeira imagem, ou seja, o momento em que a primeira imagem foi mostrada
+        self.last_update = pygame.time.get_ticks()
+
+        # controle de ticks de anomação: troca da imagem a cada self.frame_ticks milissegundos
+        # quando pygame.time.get_ticks() - self.last_update > self.frame_ticks a
+        # próxima imagem da animação será mostrada 
+        self.frame_ticks = 50
+
+    def update(self):
+        # verifica o tick atual
+        now = pygame.time.get_ticks()
+        # verifica quantos ticks se passaram desde a altima mudança de frame
+        elapsed_ticks = now - self.last_update
+
+        # se já está na hora de mudar a imagem, então ...
+        if elapsed_ticks > self.frame_ticks:
+            # marca o tick da nova imagem
+            self.last_update = now
+            # avança um quadr0
+            self.frame += 1
+
+            # verifica se já chegou no final da animação
+            if self.frame == len(self.explosion_anim):
+                # se sim, acabou a explosão
+                self.kill()
+            else:
+                # se não chegou no fim da explosão, troca de imagem
+                center = self.rect.center
+                self.image = self.explosion_anim[self.frame]
+                self.rect = self.image.get_rect()
+                self.rect.center = center
+
 game = True
 # Variável para o ajuste de velocidade
 clock = pygame.time.Clock()
@@ -225,31 +281,40 @@ while game:
     hits = pygame.sprite.groupcollide(all_meteors,all_bullets,True, True)
     for meteor in hits:
         # o meteoro é destuido e precisa ser recriado
+        assets["destroy_sound"].play()
         m = Meteor(assets)
         all_sprites.add(m)
         all_meteors.add(m)
+
+        # no lugar do meteoro antigo, adicionar uma explosão
+        explosao = Explosion(meteor.rect.center,assets)
+        all_sprites.add(explosao)
     
     # verifica se houve colisão entre o tiro e o meteoro roxo
     hits_roxo = pygame.sprite.groupcollide(all_meteors_roxo,all_bullets,True, True)
     for meteor in hits_roxo:
         # o meteoro é destuido e precisa ser recriado
+        assets["destroy_sound"].play()
         m = Meteor_roxo(assets)
         all_sprites.add(m)
         all_meteors_roxo.add(m)  
 
+        explosao = Explosion(meteor.rect.center,assets)
+        all_sprites.add(explosao)
+
     # verifica se houve colisão entre a nave e o meteoro comum
     hits = pygame.sprite.spritecollide(player,all_meteors, True)
     if len(hits) > 0:
-        boom_sound.play()
+        assets["boom_sound"].play()
         time.sleep(1) # precisa esperar se não fecha
         game = False
 
     # verifica se houve colisão entre a nave e o meteoro roxo
     hits_roxo = pygame.sprite.spritecollide(player,all_meteors_roxo, True)
     if len(hits_roxo) > 0:
-        boom_sound.play()
+        assets["boom_sound"].play()
         time.sleep(1)
-        game = False
+        game = False 
 
     # ----- Gera saídas
     window.fill((0, 0, 0))  # Preenche com a cor branca
