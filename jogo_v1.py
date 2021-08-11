@@ -10,7 +10,7 @@ pygame.mixer.init()
 WIDTH = 480
 HEIGHT = 600
 window = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption('Navinha')
+pygame.display.set_caption("Navinha")
 
 # ----- Inicia assets
 METEOR_WIDTH = 50
@@ -51,6 +51,7 @@ class Ship(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
 
         self.image = assets["ship_img"]
+        self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect()
         self.rect.centerx = WIDTH/2
         self.rect.bottom = HEIGHT - 10
@@ -100,6 +101,7 @@ class Meteor(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
 
         self.image = assets["meteor_img"]
+        self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect()
         self.rect.x = random.randint(0, WIDTH-METEOR_WIDTH)
         self.rect.y = random.randint(-100, -METEOR_HEIGHT)
@@ -124,6 +126,7 @@ class Meteor_roxo(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
 
         self.image = assets["meteor_roxo_img"]
+        self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect()
         self.rect.x = random.randint(0, WIDTH-METEOR_WIDTH)
         self.rect.y = random.randint(-100, -METEOR_HEIGHT)
@@ -150,6 +153,7 @@ class Bullet(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
 
         self.image = assets["bullet_img"]
+        self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect()
 
         # coloca no lugar inicial definido em x,y do contrutor
@@ -317,6 +321,8 @@ while state != DONE:
 
             # ganhou pontos!
             score += 100
+            if score % 1000 == 0:
+                lives += 1
         
         # verifica se houve colisão entre o tiro e o meteoro roxo
         hits_roxo = pygame.sprite.groupcollide(all_meteors_roxo,all_bullets,True, True)
@@ -332,6 +338,8 @@ while state != DONE:
 
             # ganhou pontos!
             score += 100
+            if score % 1000 == 0:
+                lives += 1
 
         # verifica se houve colisão entre a nave e o meteoro comum
         hits = pygame.sprite.spritecollide(player,all_meteors, True)
@@ -382,7 +390,7 @@ while state != DONE:
     window.blit(text_surface, text_rect)
 
     # Desenhando as vidas
-    text_surface = assets['score_font'].render(chr(9829) * lives, True, (255, 0, 0))
+    text_surface = assets["score_font"].render(chr(9829) * lives, True, (255, 0, 0))
     text_rect = text_surface.get_rect()
     text_rect.bottomleft = (10, HEIGHT - 10)
     window.blit(text_surface, text_rect)
