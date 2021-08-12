@@ -17,6 +17,8 @@ METEOR_ROXO_WIDTH = 30
 METEOR_ROXO_HEIGHT = 23
 SHIP_WIDTH = 50
 SHIP_HEIGHT = 38
+LIFE_WIDTH = 50
+LIFE_HEIGHGT = 38
 
 # Define algumas variáveis com as cores básicas
 WHITE = (255, 255, 255)
