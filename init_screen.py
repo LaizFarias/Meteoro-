@@ -11,7 +11,7 @@ def init_screen(screen):
     i = 0
 
     # fps da tela inicial
-    FPS_sc = 3
+    FPS_sc = 1
     running = True
 
     assets = load_assets()
