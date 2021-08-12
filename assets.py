@@ -16,6 +16,7 @@ BOOM_SOUND = "boom_sound"
 DESTROY_SOUND = "destroy_sound"
 PEW_SOUND = "pew_sound"
 STARTSC_ANIM = "startsc_anim"
+LIFE_IMG = "life_img"
 
 def load_assets():
     assets = {}
@@ -27,7 +28,9 @@ def load_assets():
     assets[SHIP_IMG] = pygame.image.load(os.path.join(IMG_DIR,"playerShip1_orange.png")).convert_alpha()
     assets[SHIP_IMG] = pygame.transform.scale(assets["ship_img"], (SHIP_WIDTH, SHIP_HEIGHT))
     assets[BULLET_IMG] = pygame.image.load(os.path.join(IMG_DIR,"laserRed16.png")).convert_alpha()
-    
+    assets[LIFE_IMG] = pygame.image.load(os.path.join(IMG_DIR,"life.png")).convert_alpha()
+    assets[LIFE_IMG] = pygame.transform.scale(assets["life_img"], (LIFE_WIDTH, LIFE_HEIGHGT))
+
     # animação da explosão
     explosion_anim = []
     for i in range(9):
