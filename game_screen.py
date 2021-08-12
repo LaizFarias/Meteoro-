@@ -26,8 +26,13 @@ def game_screen(window):
     player = Ship(groups,assets)
     all_sprites.add(player)
 
+    # numero de meteoros normais
+    NORMAL = 6
+    # numero de meteoros roxos
+    MATADOR = 1
+
     # criando os meteoros normais
-    for i in range(6):
+    for i in range(NORMAL):
         meteor = Meteor(assets)
         all_sprites.add(meteor)
         all_meteors.add(meteor)
@@ -35,7 +40,7 @@ def game_screen(window):
     # criando grupo de meteoros roxos
     all_meteors_roxo = pygame.sprite.Group()
     # criando os meteoros
-    for i in range(3):
+    for i in range(MATADOR):
         meteor_roxo = Meteor_roxo(assets)
         all_sprites.add(meteor_roxo)
         all_meteors_roxo.add(meteor_roxo)
@@ -110,7 +115,14 @@ def game_screen(window):
                 # ganhou pontos!
                 score += 100
                 if score % 1000 == 0:
-                    lives += 1
+                    m = Meteor_roxo(assets)
+                    all_sprites.add(m)
+                    all_meteors_roxo.add(m)
+
+                if score % 2500 == 0:
+                    m = Meteor(assets)
+                    all_sprites.add(m)
+                    all_meteors.add(m)
             
             # verifica se houve colisão entre o tiro e o meteoro roxo
             hits_roxo = pygame.sprite.groupcollide(all_meteors_roxo,all_bullets,True, True)
@@ -127,7 +139,14 @@ def game_screen(window):
                 # ganhou pontos!
                 score += 100
                 if score % 1000 == 0:
-                    lives += 1
+                    m = Meteor_roxo(assets)
+                    all_sprites.add(m)
+                    all_meteors_roxo.add(m)
+
+                if score % 2500 == 0:
+                    m = Meteor(assets)
+                    all_sprites.add(m)
+                    all_meteors.add(m)
 
             # verifica se houve colisão entre a nave e o meteoro comum
             hits = pygame.sprite.spritecollide(player,all_meteors, True)
