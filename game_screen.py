@@ -16,11 +16,15 @@ def game_screen(window):
     all_meteors_roxo = pygame.sprite.Group()
     # criando as balas
     all_bullets = pygame.sprite.Group()
+    # criando o item de vida
+    all_lifes_item = pygame.sprite.Group()
+
     groups = {}
     groups["all_sprites"] = all_sprites
     groups["all_meteors"] = all_meteors
     groups["all_meteors_roxo"] = all_meteors_roxo
     groups["all_bullets"] = all_bullets
+    groups["life_img"] = all_lifes_item 
 
     # criando o jogador
     player = Ship(groups,assets)
@@ -112,12 +116,19 @@ def game_screen(window):
                 explosao = Explosion(meteor.rect.center,assets)
                 all_sprites.add(explosao)
 
+                # se score for m1000 add meteoro roxo novo e lança item de vida
+                # se score for m2500 add meteoro comum
+
                 # ganhou pontos!
                 score += 100
                 if score % 1000 == 0:
                     m = Meteor_roxo(assets)
                     all_sprites.add(m)
                     all_meteors_roxo.add(m)
+                    # parte do item de vida
+                    item = Heart(assets)
+                    all_sprites.add(item)
+                    all_lifes_item.add(item)
 
                 if score % 2500 == 0:
                     m = Meteor(assets)
@@ -136,12 +147,16 @@ def game_screen(window):
                 explosao = Explosion(meteor.rect.center,assets)
                 all_sprites.add(explosao)
 
-                # ganhou pontos!
+                # ganhou pontos !
                 score += 100
                 if score % 1000 == 0:
                     m = Meteor_roxo(assets)
                     all_sprites.add(m)
                     all_meteors_roxo.add(m)
+                    # parte do item de vida
+                    item = Heart(assets)
+                    all_sprites.add(item)
+                    all_lifes_item.add(item)
 
                 if score % 2500 == 0:
                     m = Meteor(assets)
@@ -173,6 +188,12 @@ def game_screen(window):
                 keys_down = {}
                 explosion_ticks = pygame.time.get_ticks()
                 explosion_duration = explosao.frame_ticks*len(explosao.explosion_anim) + 400
+
+            # vamos verificar a colisão da nave com o item de vida
+            life_up = pygame.sprite.spritecollide(player,all_lifes_item,True)
+            if len(life_up) > 0:
+                lives += 1
+                #all_lifes_item.death()
         
         elif state == EXPLODING:
             now = pygame.time.get_ticks()
