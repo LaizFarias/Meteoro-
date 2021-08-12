@@ -1,6 +1,6 @@
 import random
 import pygame
-from config import WIDTH, HEIGHT, METEOR_WIDTH, METEOR_HEIGHT, SHIP_WIDTH, SHIP_HEIGHT
+from config import LIFE_HEIGHGT, LIFE_WIDTH, WIDTH, HEIGHT, METEOR_WIDTH, METEOR_HEIGHT, SHIP_WIDTH, SHIP_HEIGHT
 from assets import SHIP_IMG, PEW_SOUND, METEOR_IMG, BULLET_IMG, EXPLOSION_ANIM
 
 class Ship(pygame.sprite.Sprite):
@@ -174,3 +174,23 @@ class Explosion(pygame.sprite.Sprite):
                 self.image = self.explosion_anim[self.frame]
                 self.rect = self.image.get_rect()
                 self.rect.center = center
+
+class Heart(pygame.sprite.Sprite):
+    def __init__(self,assets):
+        pygame.sprite.Sprite.__init__(self)
+
+        self.image = assets["life_img"]
+        self.mask = pygame.mask.from_surface(self.image)
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randint(0,30)
+        self.rect.y = 0
+        self.speedx = random.randint(-3,3)
+        self.speedy = random.randint(2, 5)
+
+    def update(self):
+        # atualiza a posição do item 
+        self.rect.x += self.speedx
+        self.rect.y += self.speedy
+        # item não sair da tela pela lateral
+        if self.rect.x <= 0 or self.rect.x >= WIDTH:
+            self.speedx *= -1
