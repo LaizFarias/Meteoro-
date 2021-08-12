@@ -1,6 +1,6 @@
 import pygame
 import os
-from config import METEOR_WIDTH, METEOR_HEIGHT, SHIP_WIDTH, SHIP_HEIGHT, IMG_DIR, SND_DIR, FNT_DIR
+from config import *
 
 BACKGROUND = "background"
 METEOR_IMG = "meteor_img"
@@ -22,7 +22,7 @@ def load_assets():
     assets[METEOR_IMG] = pygame.image.load(os.path.join(IMG_DIR, "meteorBrown_med1.png")).convert_alpha()
     assets[METEOR_IMG] = pygame.transform.scale(assets["meteor_img"], (METEOR_WIDTH, METEOR_HEIGHT))
     assets[METEOR_ROXO_IMG] = pygame.image.load(os.path.join(IMG_DIR, "asteroid_roxo.png")).convert_alpha()
-    assets[METEOR_ROXO_IMG] = pygame.transform.scale(assets["meteor_roxo_img"], (METEOR_WIDTH, METEOR_HEIGHT))
+    assets[METEOR_ROXO_IMG] = pygame.transform.scale(assets["meteor_roxo_img"], (METEOR_ROXO_WIDTH, METEOR_ROXO_HEIGHT))
     assets[SHIP_IMG] = pygame.image.load(os.path.join(IMG_DIR,"playerShip1_orange.png")).convert_alpha()
     assets[SHIP_IMG] = pygame.transform.scale(assets["ship_img"], (SHIP_WIDTH, SHIP_HEIGHT))
     assets[BULLET_IMG] = pygame.image.load(os.path.join(IMG_DIR,"laserRed16.png")).convert_alpha()
