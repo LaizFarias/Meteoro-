@@ -15,6 +15,7 @@ SCORE_FONT = "score_font"
 BOOM_SOUND = "boom_sound"
 DESTROY_SOUND = "destroy_sound"
 PEW_SOUND = "pew_sound"
+STARTSC_ANIM = "startsc_anim"
 
 def load_assets():
     assets = {}
@@ -26,6 +27,8 @@ def load_assets():
     assets[SHIP_IMG] = pygame.image.load(os.path.join(IMG_DIR,"playerShip1_orange.png")).convert_alpha()
     assets[SHIP_IMG] = pygame.transform.scale(assets["ship_img"], (SHIP_WIDTH, SHIP_HEIGHT))
     assets[BULLET_IMG] = pygame.image.load(os.path.join(IMG_DIR,"laserRed16.png")).convert_alpha()
+    
+    # animação da explosão
     explosion_anim = []
     for i in range(9):
         # Os arquivos de animação são numerados de 00 a 08
@@ -35,6 +38,16 @@ def load_assets():
         explosion_anim.append(img)
     assets[EXPLOSION_ANIM] = explosion_anim
     assets[SCORE_FONT] = pygame.font.Font("assets/font/PressStart2P.ttf", 28)
+
+    # animação da tela inicial
+    startsc_anim = []
+    for i in range(2):
+        # os arquivos da animação são numerados de 00 a 01
+        filename = os.path.join(IMG_DIR, "tela_instrucoes0{}.png".format(i))
+        img = pygame.image.load(filename).convert()
+        img = pygame.transform.scale(img, (WIDTH, HEIGHT))
+        startsc_anim.append(img)
+    assets[STARTSC_ANIM] = startsc_anim 
 
     # carrega os sons do jogo
     pygame.mixer.music.load(os.path.join(SND_DIR, "tgfcoder-FrozenJam-SeamlessLoop.ogg"))
